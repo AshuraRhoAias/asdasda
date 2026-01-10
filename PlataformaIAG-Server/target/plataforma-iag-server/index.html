@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Plataforma IAG - API Server</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+        }
+        .container {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 3rem;
+            border-radius: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            max-width: 600px;
+            text-align: center;
+        }
+        h1 { font-size: 2.5rem; margin-bottom: 1rem; }
+        .status {
+            display: inline-block;
+            background: #10b981;
+            padding: 0.5rem 1rem;
+            border-radius: 50px;
+            font-weight: bold;
+            margin: 1rem 0;
+        }
+        .endpoints {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 1.5rem;
+            border-radius: 10px;
+            margin: 1.5rem 0;
+            text-align: left;
+        }
+        .endpoint {
+            margin: 0.8rem 0;
+            padding: 0.5rem;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 5px;
+        }
+        .method {
+            display: inline-block;
+            padding: 0.2rem 0.5rem;
+            border-radius: 3px;
+            font-weight: bold;
+            font-size: 0.8rem;
+            margin-right: 0.5rem;
+        }
+        .get { background: #10b981; }
+        .post { background: #3b82f6; }
+        .put { background: #f59e0b; }
+        .delete { background: #ef4444; }
+        a {
+            color: #60a5fa;
+            text-decoration: none;
+            word-break: break-all;
+        }
+        a:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🤖 Plataforma IAG</h1>
+        <h2>Backend API REST</h2>
+        <div class="status">✓ Servidor Activo</div>
+        
+        <p style="margin: 1.5rem 0;">
+            Este es el backend API REST. Para usar la aplicación, abre el <strong>frontend web</strong>.
+        </p>
+
+        <div class="endpoints">
+            <h3 style="margin-bottom: 1rem;">📡 Endpoints Disponibles:</h3>
+            
+            <div class="endpoint">
+                <span class="method get">GET</span>
+                <a href="api/categorias" target="_blank">/api/categorias</a>
+            </div>
+            
+            <div class="endpoint">
+                <span class="method get">GET</span>
+                <a href="api/contenidos" target="_blank">/api/contenidos</a>
+            </div>
+            
+            <div class="endpoint">
+                <span class="method get">GET</span>
+                <a href="api/contenidos?estado=publicado" target="_blank">/api/contenidos?estado=publicado</a>
+            </div>
+            
+            <div class="endpoint">
+                <span class="method post">POST</span>
+                /api/auth/login
+            </div>
+            
+            <div class="endpoint">
+                <span class="method post">POST</span>
+                /api/auth/registro
+            </div>
+            
+            <div class="endpoint">
+                <span class="method post">POST</span>
+                /api/contenidos <em>(admin)</em>
+            </div>
+        </div>
+
+        <div style="margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid rgba(255,255,255,0.3);">
+            <p><strong>Credenciales de prueba:</strong></p>
+            <p>Admin: admin@iag.com / admin123</p>
+            <p>Usuario: usuario@iag.com / usuario123</p>
+        </div>
+    </div>
+</body>
+</html>

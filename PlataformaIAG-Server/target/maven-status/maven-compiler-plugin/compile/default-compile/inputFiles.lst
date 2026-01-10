@@ -1,0 +1,16 @@
+C:\Users\anton\Documents\NetBeansProjects\PlataformaIAG-Completo\PlataformaIAG-Server\src\main\java\com\iag\resources\ContenidoResource.java
+C:\Users\anton\Documents\NetBeansProjects\PlataformaIAG-Completo\PlataformaIAG-Server\src\main\java\com\iag\filters\HttpServletRequest.java
+C:\Users\anton\Documents\NetBeansProjects\PlataformaIAG-Completo\PlataformaIAG-Server\src\main\java\com\iag\models\Contenido.java
+C:\Users\anton\Documents\NetBeansProjects\PlataformaIAG-Completo\PlataformaIAG-Server\src\main\java\com\iag\filters\CorsFilter.java
+C:\Users\anton\Documents\NetBeansProjects\PlataformaIAG-Completo\PlataformaIAG-Server\src\main\java\com\iag\resources\AuthResource.java
+C:\Users\anton\Documents\NetBeansProjects\PlataformaIAG-Completo\PlataformaIAG-Server\src\main\java\com\iag\resources\UsuarioResource.java
+C:\Users\anton\Documents\NetBeansProjects\PlataformaIAG-Completo\PlataformaIAG-Server\src\main\java\com\iag\utils\JWTUtil.java
+C:\Users\anton\Documents\NetBeansProjects\PlataformaIAG-Completo\PlataformaIAG-Server\src\main\java\com\iag\resources\CategoriaResource.java
+C:\Users\anton\Documents\NetBeansProjects\PlataformaIAG-Completo\PlataformaIAG-Server\src\main\java\com\iag\models\Usuario.java
+C:\Users\anton\Documents\NetBeansProjects\PlataformaIAG-Completo\PlataformaIAG-Server\src\main\java\com\iag\dao\CategoriaDAO.java
+C:\Users\anton\Documents\NetBeansProjects\PlataformaIAG-Completo\PlataformaIAG-Server\src\main\java\com\iag\dao\UsuarioDAO.java
+C:\Users\anton\Documents\NetBeansProjects\PlataformaIAG-Completo\PlataformaIAG-Server\src\main\java\com\iag\models\Categoria.java
+C:\Users\anton\Documents\NetBeansProjects\PlataformaIAG-Completo\PlataformaIAG-Server\src\main\java\com\iag\JaxRsApplication.java
+C:\Users\anton\Documents\NetBeansProjects\PlataformaIAG-Completo\PlataformaIAG-Server\src\main\java\com\iag\dao\ContenidoDAO.java
+C:\Users\anton\Documents\NetBeansProjects\PlataformaIAG-Completo\PlataformaIAG-Server\src\main\java\com\iag\config\DatabaseConfig.java
+C:\Users\anton\Documents\NetBeansProjects\PlataformaIAG-Completo\PlataformaIAG-Server\src\main\java\com\iag\utils\HashUtils.java

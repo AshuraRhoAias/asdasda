@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nuevo Contenido - Plataforma IAG</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="../../js/config.js"></script>
+    <script src="../../js/api.js"></script>
+    <script src="../../js/utils.js"></script>
+</head>
+<body class="bg-gray-50">
+    
+    <!-- Navbar Admin -->
+    <nav class="bg-indigo-900 text-white shadow-lg">
+        <div class="container mx-auto px-6 py-4">
+            <div class="flex justify-between items-center">
+                <div class="flex items-center space-x-2">
+                    <span class="text-3xl">🤖</span>
+                    <span class="text-2xl font-bold">Plataforma IAG - Admin</span>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <a href="dashboard.html" class="hover:text-indigo-200 transition">← Dashboard</a>
+                    <span id="adminNombre" class="font-semibold"></span>
+                    <button onclick="logout()" class="bg-red-600 px-4 py-2 rounded hover:bg-red-700 transition">
+                        Cerrar Sesión
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mx-auto px-6 py-8">
+        <div class="max-w-4xl mx-auto">
+            <div class="bg-white rounded-xl shadow-lg p-8">
+                <h1 class="text-3xl font-bold text-gray-800 mb-6">➕ Crear Nuevo Contenido</h1>
+
+                <form id="nuevoContenidoForm" class="space-y-6">
+                    <!-- Título -->
+                    <div>
+                        <label class="block text-gray-700 font-semibold mb-2">Título *</label>
+                        <input type="text" id="titulo" required
+                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                               placeholder="Escribe un título atractivo...">
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <!-- Tipo -->
+                        <div>
+                            <label class="block text-gray-700 font-semibold mb-2">Tipo *</label>
+                            <select id="tipo" required
+                                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                <option value="artículo">📄 Artículo</option>
+                                <option value="tip">💡 Tip</option>
+                                <option value="noticia">📰 Noticia</option>
+                                <option value="tutorial">🎓 Tutorial</option>
+                                <option value="recurso">📚 Recurso</option>
+                            </select>
+                        </div>
+
+                        <!-- Estado -->
+                        <div>
+                            <label class="block text-gray-700 font-semibold mb-2">Estado *</label>
+                            <select id="estado" required
+                                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                <option value="borrador">📝 Borrador</option>
+                                <option value="publicado">✅ Publicado</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Categorías -->
+                    <div>
+                        <label class="block text-gray-700 font-semibold mb-2">Categorías *</label>
+                        <p class="text-sm text-gray-500 mb-3">Selecciona al menos una categoría</p>
+                        <div id="categoriasCheckboxes" class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                            <!-- Se llena dinámicamente -->
+                        </div>
+                    </div>
+
+                    <!-- Contenido -->
+                    <div>
+                        <label class="block text-gray-700 font-semibold mb-2">Contenido *</label>
+                        <textarea id="cuerpo" required rows="12"
+                                  class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                                  placeholder="Escribe el contenido completo aquí..."></textarea>
+                        <p class="text-sm text-gray-500 mt-2">
+                            Tip: Usa saltos de línea para separar párrafos
+                        </p>
+                    </div>
+
+                    <!-- Botones -->
+                    <div class="flex justify-between items-center pt-6 border-t">
+                        <a href="dashboard.html" 
+                           class="text-gray-600 hover:text-gray-800 font-semibold">
+                            Cancelar
+                        </a>
+                        <button type="submit"
+                                class="bg-indigo-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-indigo-700 transition">
+                            💾 Guardar Contenido
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Verificar autenticación y rol admin
+        if (!isAuthenticated() || !isAdmin()) {
+            mostrarAlerta('Acceso denegado', 'error');
+            setTimeout(() => window.location.href = '../login.html', 1500);
+        }
+
+        // Cargar nombre del admin
+        const user = getUser();
+        document.getElementById('adminNombre').textContent = user.nombre;
+
+        // Cargar categorías
+        async function cargarCategorias() {
+            try {
+                const categorias = await API.obtenerCategorias();
+                const container = document.getElementById('categoriasCheckboxes');
+                
+                let html = '';
+                categorias.forEach(cat => {
+                    html += `
+                        <label class="flex items-center p-3 border rounded-lg cursor-pointer hover:bg-gray-50 transition">
+                            <input type="checkbox" name="categorias" value="${cat.id}" 
+                                   class="w-5 h-5 text-indigo-600 rounded focus:ring-2 focus:ring-indigo-500">
+                            <span class="ml-3 flex items-center">
+                                <span class="text-2xl mr-2">${cat.icono}</span>
+                                <span class="font-semibold" style="color: ${cat.color}">${cat.nombre}</span>
+                            </span>
+                        </label>
+                    `;
+                });
+                
+                container.innerHTML = html;
+            } catch (error) {
+                console.error('Error al cargar categorías:', error);
+                mostrarAlerta('Error al cargar categorías', 'error');
+            }
+        }
+
+        // Manejo del formulario
+        document.getElementById('nuevoContenidoForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const titulo = document.getElementById('titulo').value.trim();
+            const tipo = document.getElementById('tipo').value;
+            const estado = document.getElementById('estado').value;
+            const cuerpo = document.getElementById('cuerpo').value.trim();
+            
+            // Obtener categorías seleccionadas
+            const categoriasCheckboxes = document.querySelectorAll('input[name="categorias"]:checked');
+            const categorias = Array.from(categoriasCheckboxes).map(cb => parseInt(cb.value));
+            
+            // Validaciones
+            if (!titulo || !cuerpo) {
+                mostrarAlerta('Por favor completa todos los campos obligatorios', 'error');
+                return;
+            }
+            
+            if (categorias.length === 0) {
+                mostrarAlerta('Selecciona al menos una categoría', 'error');
+                return;
+            }
+            
+            const contenido = {
+                titulo,
+                cuerpo,
+                tipo,
+                estado,
+                categorias
+            };
+            
+            mostrarLoading();
+            
+            try {
+                const response = await API.crearContenido(contenido);
+                
+                if (response.success) {
+                    mostrarAlerta('Contenido creado exitosamente', 'success');
+                    setTimeout(() => {
+                        window.location.href = 'dashboard.html';
+                    }, 1500);
+                } else {
+                    mostrarAlerta(response.message || 'Error al crear contenido', 'error');
+                    ocultarLoading();
+                }
+            } catch (error) {
+                console.error('Error al crear contenido:', error);
+                mostrarAlerta('Error al conectar con el servidor', 'error');
+                ocultarLoading();
+            }
+        });
+
+        // Inicializar
+        document.addEventListener('DOMContentLoaded', () => {
+            cargarCategorias();
+        });
+    </script>
+
+</body>
+</html>
