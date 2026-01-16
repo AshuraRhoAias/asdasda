@@ -12,7 +12,6 @@ com\iag\models\Categoria.class
 com\iag\resources\AuthResource.class
 com\iag\resources\ContenidoResource$2.class
 com\iag\dao\UsuarioDAO.class
-com\iag\filters\HttpServletRequest.class
 com\iag\filters\CorsFilter.class
 com\iag\resources\ContenidoResource$AuthData.class
 com\iag\resources\ContenidoResource.class

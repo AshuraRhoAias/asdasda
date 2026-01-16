@@ -70,6 +70,27 @@ public class ContenidoResource {
         }
     }
 
+    
+    /* ===========================
+       GET - CONTENIDOS POR CATEGORÍA
+       =========================== */
+    @GET
+    @Path("/categoria/{categoriaId}")
+    public Response obtenerPorCategoria(@PathParam("categoriaId") int categoriaId) {
+        LOG.info("GET /contenidos/categoria/" + categoriaId);
+
+        try {
+            List<Contenido> contenidos = contenidoDAO.obtenerPorCategoria(categoriaId);
+
+            LOG.info("Contenidos encontrados para categoría " + categoriaId + ": " + contenidos.size());
+            return Response.ok(gson.toJson(contenidos)).build();
+
+        } catch (Exception e) {
+            LOG.log(Level.SEVERE, "ERROR obtenerPorCategoria", e);
+            return error500("Error al obtener contenidos por categoría", e);
+        }
+    }
+
     /* ===========================
        POST
        =========================== */
@@ -79,31 +100,47 @@ public class ContenidoResource {
         LOG.info("BODY RECIBIDO: " + body);
 
         try {
-            AuthData auth = validarAdmin(headers);
+    AuthData auth = validarAdmin(headers);
 
-            LOG.info("AUTORIZADO | userId=" + auth.userId + " | rol=" + auth.rol);
+    // ✅ AGREGAR ESTOS LOGS
+    LOG.info("=================================================");
+    LOG.info("AUTORIZADO | userId=" + auth.userId + " | rol=" + auth.rol);
+    LOG.info("userId es null? " + (auth.userId == null));
+    LOG.info("=================================================");
 
-            JsonObject json = gson.fromJson(body, JsonObject.class);
+    JsonObject json = gson.fromJson(body, JsonObject.class);
 
-            Contenido contenido = new Contenido();
-            contenido.setTitulo(json.get("titulo").getAsString());
-            contenido.setCuerpo(json.get("cuerpo").getAsString());
-            contenido.setTipo(json.get("tipo").getAsString());
-            contenido.setEstado(json.get("estado").getAsString());
-            contenido.setAutorId(auth.userId);
+    // ✅ AGREGAR ESTOS LOGS
+    LOG.info("BODY parseado:");
+    LOG.info("  - titulo: " + json.get("titulo").getAsString());
+    LOG.info("  - tipo: " + json.get("tipo").getAsString());
+    LOG.info("  - estado: " + json.get("estado").getAsString());
 
-            List<Integer> categoriasIds = gson.fromJson(
-                    json.get("categorias"),
-                    new TypeToken<List<Integer>>() {
-                    }.getType()
-            );
+    Contenido contenido = new Contenido();
+    contenido.setTitulo(json.get("titulo").getAsString());
+    contenido.setCuerpo(json.get("cuerpo").getAsString());
+    contenido.setTipo(json.get("tipo").getAsString());
+    contenido.setEstado(json.get("estado").getAsString());
+    contenido.setAutorId(auth.userId);
 
-            LOG.info("CREANDO CONTENIDO | titulo=" + contenido.getTitulo());
-            LOG.info("CATEGORIAS: " + categoriasIds);
+    // ✅ AGREGAR ESTE LOG
+    LOG.info("Contenido configurado | autorId=" + contenido.getAutorId());
 
-            boolean creado = contenidoDAO.crear(contenido, categoriasIds);
+    List<Integer> categoriasIds = gson.fromJson(
+            json.get("categorias"),
+            new TypeToken<List<Integer>>() {}.getType()
+    );
 
-            LOG.info("RESULTADO DAO.crear = " + creado);
+    LOG.info("CATEGORIAS: " + categoriasIds);
+    
+    // ✅ AGREGAR ESTE LOG
+    LOG.info("Llamando a DAO.crear()...");
+
+    boolean creado = contenidoDAO.crear(contenido, categoriasIds);
+
+    LOG.info("RESULTADO DAO.crear = " + creado);
+    
+    // ... resto del código
 
             if (!creado) {
                 return error500("Error al crear contenido", null);
@@ -114,12 +151,22 @@ public class ContenidoResource {
                     .build();
 
         } catch (WebApplicationException e) {
-            LOG.warning("DENEGADO: " + e.getResponse().getStatus());
-            return e.getResponse();
-        } catch (Exception e) {
-            LOG.log(Level.SEVERE, "ERROR crear contenido", e);
-            return error500("Error en el servidor", e);
-        }
+    LOG.warning("DENEGADO: " + e.getResponse().getStatus());
+    return e.getResponse();
+} catch (Exception e) {
+    LOG.log(Level.SEVERE, "ERROR CRÍTICO al crear contenido", e);
+    e.printStackTrace(); // Ver stack trace completo
+    
+    // Retornar error más descriptivo
+    JsonObject error = new JsonObject();
+    error.addProperty("success", false);
+    error.addProperty("message", "Error al crear contenido: " + e.getMessage());
+    error.addProperty("error", e.getClass().getName());
+    
+    return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+            .entity(gson.toJson(error))
+            .build();
+}
     }
 
     /* ===========================
@@ -241,30 +288,36 @@ public class ContenidoResource {
        SEGURIDAD
        =========================== */
     private AuthData validarAdmin(HttpHeaders headers) {
-        String authHeader = headers.getHeaderString(HttpHeaders.AUTHORIZATION);
+    String authHeader = headers.getHeaderString(HttpHeaders.AUTHORIZATION);
 
-        LOG.info("AUTH HEADER RECIBIDO: " + authHeader);
+    LOG.info("AUTH HEADER RECIBIDO: " + authHeader);
 
-        if (authHeader == null || !authHeader.toLowerCase().startsWith("bearer ")) {
-            LOG.warning("TOKEN NO PROPORCIONADO");
-            throw new WebApplicationException(error401("Token no proporcionado"));
-        }
-
-        String token = authHeader.substring(7);
-        LOG.info("TOKEN EXTRAIDO: " + token);
-
-        String rol = JWTUtil.getRolFromToken(token);
-        Integer userId = JWTUtil.getUserIdFromToken(token);
-
-        LOG.info("TOKEN DATA | userId=" + userId + " | rol=" + rol);
-
-        if (rol == null || !rol.trim().equalsIgnoreCase("admin")) {
-            LOG.warning("ROL NO AUTORIZADO: " + rol);
-            throw new WebApplicationException(error403("No tienes permisos"));
-        }
-
-        return new AuthData(userId, rol);
+    if (authHeader == null || !authHeader.toLowerCase().startsWith("bearer ")) {
+        LOG.warning("TOKEN NO PROPORCIONADO");
+        throw new WebApplicationException(error401("Token no proporcionado"));
     }
+
+    String token = authHeader.substring(7);
+    LOG.info("TOKEN EXTRAIDO: " + token);
+
+    String rol = JWTUtil.getRolFromToken(token);
+    Integer userId = JWTUtil.getUserIdFromToken(token);
+
+    LOG.info("TOKEN DATA | userId=" + userId + " | rol=" + rol);
+
+    // ✅ AGREGAR ESTA VALIDACIÓN
+    if (userId == null) {
+        LOG.severe("❌ ERROR: userId es NULL del token!");
+        throw new WebApplicationException(error401("Token inválido: userId es null"));
+    }
+
+    if (rol == null || !rol.trim().equalsIgnoreCase("admin")) {
+        LOG.warning("ROL NO AUTORIZADO: " + rol);
+        throw new WebApplicationException(error403("No tienes permisos"));
+    }
+
+    return new AuthData(userId, rol);
+}
 
     /* ===========================
        ERRORES

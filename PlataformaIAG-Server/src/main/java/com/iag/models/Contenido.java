@@ -101,9 +101,14 @@ public class Contenido {
     }
     
     public String getExtracto() {
-        if (cuerpo != null && cuerpo.length() > 150) {
-            return cuerpo.substring(0, 150) + "...";
-        }
-        return cuerpo;
+    if (cuerpo == null || cuerpo.isEmpty()) {
+        return "";
     }
+    
+    if (cuerpo.length() > 150) {
+        return cuerpo.substring(0, 150) + "...";
+    }
+    
+    return cuerpo;
+}
 }

@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel Admin - Plataforma IAG</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="../../js/config.js"></script>
+    <script src="../../js/api.js"></script>
+    <script src="../../js/utils.js"></script>
+</head>
+<body class="bg-gray-50">
+    
+    <!-- Navbar Admin -->
+    <nav class="bg-indigo-900 text-white shadow-lg">
+        <div class="container mx-auto px-6 py-4">
+            <div class="flex justify-between items-center">
+                <div class="flex items-center space-x-2">
+                    <span class="text-3xl">🤖</span>
+                    <span class="text-2xl font-bold">Plataforma IAG - Admin</span>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <a href="../home.html" class="hover:text-indigo-200 transition">Ver Sitio</a>
+                    <span id="adminNombre" class="font-semibold"></span>
+                    <button onclick="logout()" class="bg-red-600 px-4 py-2 rounded hover:bg-red-700 transition">
+                        Cerrar Sesión
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mx-auto px-6 py-8">
+        <!-- Estadísticas -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <div class="bg-white rounded-xl shadow-lg p-6">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-gray-500 text-sm font-semibold">Total de Contenidos</p>
+                        <p id="totalContenidos" class="text-4xl font-bold text-indigo-600">0</p>
+                    </div>
+                    <div class="bg-indigo-100 p-4 rounded-full">
+                        <span class="text-4xl">📄</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-xl shadow-lg p-6">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-gray-500 text-sm font-semibold">Total de Categorías</p>
+                        <p id="totalCategorias" class="text-4xl font-bold text-purple-600">0</p>
+                    </div>
+                    <div class="bg-purple-100 p-4 rounded-full">
+                        <span class="text-4xl">🏷️</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-xl shadow-lg p-6">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-gray-500 text-sm font-semibold">Total de Usuarios</p>
+                        <p id="totalUsuarios" class="text-4xl font-bold text-green-600">0</p>
+                    </div>
+                    <div class="bg-green-100 p-4 rounded-full">
+                        <span class="text-4xl">👥</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Acciones Rápidas -->
+        <div class="bg-white rounded-xl shadow-lg p-6 mb-8">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">⚡ Acciones Rápidas</h2>
+            <div class="flex flex-wrap gap-4">
+                <a href="contenido-nuevo.html" 
+                   class="bg-indigo-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-indigo-700 transition flex items-center">
+                    <span class="text-xl mr-2">➕</span> Nuevo Contenido
+                </a>
+                <button onclick="window.location.reload()" 
+                        class="bg-gray-200 text-gray-700 px-6 py-3 rounded-lg font-semibold hover:bg-gray-300 transition flex items-center">
+                    <span class="text-xl mr-2">🔄</span> Actualizar
+                </button>
+            </div>
+        </div>
+
+        <!-- Tabla de Contenidos -->
+        <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+            <div class="p-6 border-b">
+                <h2 class="text-2xl font-bold text-gray-800">📚 Gestión de Contenidos</h2>
+            </div>
+            
+            <div class="overflow-x-auto">
+                <table class="w-full">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase">ID</th>
+                            <th class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Título</th>
+                            <th class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Tipo</th>
+                            <th class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Estado</th>
+                            <th class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Vistas</th>
+                            <th class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Fecha</th>
+                            <th class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="contenidosTable" class="divide-y divide-gray-200">
+                        <!-- Se llena dinámicamente -->
+                    </tbody>
+                </table>
+            </div>
+
+            <div id="noContenidos" class="hidden p-12 text-center">
+                <div class="text-6xl mb-4">📭</div>
+                <p class="text-xl text-gray-600">No hay contenidos aún</p>
+                <a href="contenido-nuevo.html" class="inline-block mt-4 text-indigo-600 font-semibold hover:text-indigo-800">
+                    Crear el primero →
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Verificar autenticación y rol admin
+        if (!isAuthenticated() || !isAdmin()) {
+            mostrarAlerta('Acceso denegado', 'error');
+            setTimeout(() => window.location.href = '../login.html', 1500);
+        }
+
+        // Cargar nombre del admin
+        const user = getUser();
+        document.getElementById('adminNombre').textContent = user.nombre;
+
+        // Cargar estadísticas
+        async function cargarEstadisticas() {
+            try {
+                const [contenidos, categorias, usuarios] = await Promise.all([
+                    API.contarContenidos(),
+                    API.contarCategorias(),
+                    API.contarUsuarios()
+                ]);
+
+                document.getElementById('totalContenidos').textContent = contenidos.total || 0;
+                document.getElementById('totalCategorias').textContent = categorias.total || 0;
+                document.getElementById('totalUsuarios').textContent = usuarios.total || 0;
+            } catch (error) {
+                console.error('Error al cargar estadísticas:', error);
+            }
+        }
+
+        // Cargar contenidos en tabla
+        async function cargarContenidos() {
+            mostrarLoading();
+            
+            try {
+                const contenidos = await API.obtenerContenidos();
+                mostrarTabla(contenidos);
+            } catch (error) {
+                console.error('Error al cargar contenidos:', error);
+                mostrarAlerta('Error al cargar contenidos', 'error');
+            } finally {
+                ocultarLoading();
+            }
+        }
+
+        // Mostrar contenidos en tabla
+        function mostrarTabla(contenidos) {
+            const tbody = document.getElementById('contenidosTable');
+            const noContenidos = document.getElementById('noContenidos');
+            
+            if (!contenidos || contenidos.length === 0) {
+                tbody.innerHTML = '';
+                noContenidos.classList.remove('hidden');
+                return;
+            }
+            
+            noContenidos.classList.add('hidden');
+            
+            let html = '';
+            contenidos.forEach(contenido => {
+                html += `
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-6 py-4 text-sm text-gray-900">${contenido.id}</td>
+                        <td class="px-6 py-4">
+                            <div class="text-sm font-semibold text-gray-900">${contenido.titulo}</div>
+                            <div class="text-xs text-gray-500">${contenido.cuerpo.substring(0, 50)}...</div>
+                        </td>
+                        <td class="px-6 py-4">
+                            ${crearBadgeTipo(contenido.tipo)}
+                        </td>
+                        <td class="px-6 py-4">
+                            ${crearBadgeEstado(contenido.estado)}
+                        </td>
+                        <td class="px-6 py-4 text-sm text-gray-900">
+                            <span class="flex items-center">
+                                👁️ ${contenido.vistas}
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 text-sm text-gray-500">
+                            ${formatearFecha(contenido.fechaPublicacion)}
+                        </td>
+                        <td class="px-6 py-4 text-sm">
+                            <div class="flex space-x-2">
+                                <a href="../contenido-detalle.html?id=${contenido.id}" 
+                                   class="text-blue-600 hover:text-blue-800" title="Ver">
+                                    👁️
+                                </a>
+                                <a href="contenido-editar.html?id=${contenido.id}" 
+                                   class="text-indigo-600 hover:text-indigo-800" title="Editar">
+                                    ✏️
+                                </a>
+                                <button onclick="confirmarEliminar(${contenido.id}, '${contenido.titulo}')" 
+                                        class="text-red-600 hover:text-red-800" title="Eliminar">
+                                    🗑️
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            });
+            
+            tbody.innerHTML = html;
+        }
+
+        // Confirmar eliminación
+        function confirmarEliminar(id, titulo) {
+            if (confirm(`¿Estás seguro de eliminar el contenido:\n"${titulo}"?`)) {
+                eliminarContenido(id);
+            }
+        }
+
+        // Eliminar contenido
+        async function eliminarContenido(id) {
+            mostrarLoading();
+            
+            try {
+                const response = await API.eliminarContenido(id);
+                
+                if (response.success) {
+                    mostrarAlerta('Contenido eliminado exitosamente', 'success');
+                    await cargarContenidos();
+                    await cargarEstadisticas();
+                } else {
+                    mostrarAlerta(response.message || 'Error al eliminar contenido', 'error');
+                }
+            } catch (error) {
+                console.error('Error al eliminar:', error);
+                mostrarAlerta('Error al eliminar contenido', 'error');
+            } finally {
+                ocultarLoading();
+            }
+        }
+
+        // Inicializar
+        document.addEventListener('DOMContentLoaded', async () => {
+            await cargarEstadisticas();
+            await cargarContenidos();
+        });
+    </script>
+
+</body>
+</html>

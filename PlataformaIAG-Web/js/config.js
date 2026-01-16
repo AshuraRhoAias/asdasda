@@ -34,9 +34,10 @@ function logout() {
     window.location.href = '/web/login.html';
 }
 
-// Verificar si el usuario es admin
 function isAdmin() {
     const user = getUser();
-    return user && user.rol === 'admin';
-    
+    if (!user || !user.rol) {
+        return false;
+    }
+    return user.rol.toLowerCase().trim() === 'admin';
 }

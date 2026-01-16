@@ -8,7 +8,7 @@ import java.util.List;
 
 public class ContenidoDAO {
     
-    private CategoriaDAO categoriaDAO;
+    private final CategoriaDAO categoriaDAO;
     
     public ContenidoDAO() {
         this.categoriaDAO = new CategoriaDAO();
@@ -109,32 +109,55 @@ public class ContenidoDAO {
     }
     
     public boolean crear(Contenido contenido, List<Integer> categoriasIds) {
-        String sql = "INSERT INTO contenidos (titulo, cuerpo, tipo, estado, autor_id) VALUES (?, ?, ?, ?, ?)";
-        
-        try (Connection conn = DatabaseConfig.getInstance().getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
-            
-            stmt.setString(1, contenido.getTitulo());
-            stmt.setString(2, contenido.getCuerpo());
-            stmt.setString(3, contenido.getTipo());
-            stmt.setString(4, contenido.getEstado());
-            stmt.setInt(5, contenido.getAutorId());
-            
-            int rows = stmt.executeUpdate();
-            
-            if (rows > 0) {
-                ResultSet rs = stmt.getGeneratedKeys();
-                if (rs.next()) {
-                    int contenidoId = rs.getInt(1);
-                    return asignarCategorias(contenidoId, categoriasIds);
-                }
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
+
+    String sqlContenido = "INSERT INTO contenidos (titulo, cuerpo, tipo, estado, autor_id) VALUES (?, ?, ?, ?, ?)";
+    String sqlCategoria = "INSERT INTO contenido_categorias (contenido_id, categoria_id) VALUES (?, ?)";
+    System.out.println("INSERT CONTENIDO | autor_id=" + contenido.getAutorId());
+System.out.println("CATEGORIAS=" + categoriasIds);
+
+
+    try (Connection conn = DatabaseConfig.getInstance().getConnection()) {
+
+        conn.setAutoCommit(false);
+
+        PreparedStatement stmt = conn.prepareStatement(
+                sqlContenido, Statement.RETURN_GENERATED_KEYS);
+
+        stmt.setString(1, contenido.getTitulo());
+        stmt.setString(2, contenido.getCuerpo());
+        stmt.setString(3, contenido.getTipo());
+        stmt.setString(4, contenido.getEstado());
+        stmt.setInt(5, contenido.getAutorId());
+
+        stmt.executeUpdate();
+
+        ResultSet rs = stmt.getGeneratedKeys();
+        if (!rs.next()) {
+            conn.rollback();
+            return false;
         }
+
+        int contenidoId = rs.getInt(1);
+
+        PreparedStatement stmtCat = conn.prepareStatement(sqlCategoria);
+        for (Integer catId : categoriasIds) {
+            stmtCat.setInt(1, contenidoId);
+            stmtCat.setInt(2, catId);
+            stmtCat.addBatch();
+        }
+
+        stmtCat.executeBatch();
+
+        conn.commit();
+        return true;
         
+
+    } catch (Exception e) {
+        e.printStackTrace();
         return false;
     }
+}
+
     
     public boolean actualizar(Contenido contenido, List<Integer> categoriasIds) {
         String sql = "UPDATE contenidos SET titulo = ?, cuerpo = ?, tipo = ?, estado = ? WHERE id = ?";
