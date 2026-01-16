@@ -1,6 +1,7 @@
 // Configuración global de la aplicación
 const CONFIG = {
-    API_URL: 'http://localhost:8080/api',
+    // ✅ Detectar automáticamente la URL base
+    API_URL: window.location.origin + '/api',
     TOKEN_KEY: 'iag_token',
     USER_KEY: 'iag_user'
 };
