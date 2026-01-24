@@ -6,18 +6,16 @@ import java.sql.SQLException;
 
 public class DatabaseConfig {
 
-    // 🔍 VERIFICAR estas líneas (7-16)
+    // ✅ CORREGIDO - SIN comillas extras, SIN "j\"" al inicio
     private static final String URL = System.getenv("DB_URL") != null
             ? System.getenv("DB_URL")
-            : "jdbc:mysql://localhost:3306/bryan?useSSL=false&serverTimezone=UTC";
+            : "jdbc:mysql://localhost:3306/bryan?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true";
 
     private static final String USER = System.getenv("DB_USER") != null
             ? System.getenv("DB_USER")
-            : "bryan";  // ✅ Asegúrate que este usuario exista en MySQL
+            : "root";  // Usa root temporalmente
 
-    private static final String PASSWORD = System.getenv("DB_PASSWORD") != null
-            ? System.getenv("DB_PASSWORD")
-            : "bryan";  // ✅ Asegúrate que la contraseña sea correcta
+    private static final String PASSWORD = "bryan";
 
     private static DatabaseConfig instance;
 

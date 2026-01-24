@@ -25,9 +25,9 @@
 
         <!-- Jakarta EE API (PROVIDED por el servidor: Tomcat, Payara, WildFly, etc.) -->
         <dependency>
-            <groupId>jakarta.platform</groupId>
-            <artifactId>jakarta.jakartaee-api</artifactId>
-            <version>${jakarta.version}</version>
+            <groupId>jakarta.servlet</groupId>
+            <artifactId>jakarta.servlet-api</artifactId>
+            <version>5.0.0</version>
             <scope>provided</scope>
         </dependency>
 

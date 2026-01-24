@@ -3,8 +3,8 @@
     <properties xmlns="http://www.netbeans.org/ns/maven-properties-data/1">
         <!-- Líneas existentes... -->
         <org-netbeans-modules-maven-j2ee.netbeans_2e_hint_2e_deploy_2e_server>Tomcat</org-netbeans-modules-maven-j2ee.netbeans_2e_hint_2e_deploy_2e_server>
-        
         <!-- ✅ AGREGAR ESTA LÍNEA -->
         <org-netbeans-modules-maven-jaxws.rest_2e_config_2e_type>/</org-netbeans-modules-maven-jaxws.rest_2e_config_2e_type>
+        <org-netbeans-modules-maven-j2ee.netbeans_2e_hint_2e_j2eeVersion>10-web</org-netbeans-modules-maven-j2ee.netbeans_2e_hint_2e_j2eeVersion>
     </properties>
 </project-shared-configuration>
